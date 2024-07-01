@@ -33,13 +33,14 @@ func (c *Course) FindAll() ([]Course, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	categories := []Course{}
+	courses := []Course{}
 	for rows.Next() {
 		var id, name, description, categoryID string
-		if err := rows.Scan(&id, &name, &description, &categoryID); err != nil {
+		err := rows.Scan(&id, &name, &description, &categoryID)
+		if err != nil {
 			return nil, err
 		}
-		categories = append(categories, Course{ID: id, Name: name, Description: description, Category: categoryID})
+		courses = append(courses, Course{ID: id, Name: name, Description: description, Category: categoryID})
 	}
-	return categories, nil
+	return courses, nil
 }
