@@ -15,7 +15,6 @@ func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCa
 	if err != nil {
 		return nil, err
 	}
-
 	return &model.Category{
 		ID:          category.ID,
 		Name:        category.Name,
@@ -51,6 +50,7 @@ func (r *mutationResolver) CreateCourses(ctx context.Context, input model.NewCou
 // Categories is the resolver for the categories field.
 func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, error) {
 	categories, err := r.CategoryDB.FindAll()
+
 	if err != nil {
 		return nil, err
 	}
@@ -58,10 +58,30 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, erro
 	var categoriesModel []*model.Category
 
 	for _, category := range categories {
+		courses, coursesErr := r.CourseDB.FindByCategoryId(category.ID)
+		if coursesErr != nil {
+			return nil, coursesErr
+		}
+		var coursesModel []*model.Course
+
+		for _, course := range courses {
+			coursesModel = append(coursesModel, &model.Course{
+				ID:          course.ID,
+				Name:        course.Name,
+				Description: &course.Description,
+				Category: &model.Category{
+					ID:          category.ID,
+					Name:        category.Name,
+					Description: &category.Description,
+				},
+			})
+		}
+
 		categoriesModel = append(categoriesModel, &model.Category{
 			ID:          category.ID,
 			Name:        category.Name,
 			Description: &category.Description,
+			Courses:     coursesModel,
 		})
 	}
 
