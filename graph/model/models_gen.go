@@ -27,7 +27,7 @@ type NewCategory struct {
 type NewCourse struct {
 	Name        string  `json:"name"`
 	Description *string `json:"description,omitempty"`
-	CategoryID  string  `json:"categoryId"`
+	CategoryID  string  `json:"categoryID"`
 }
 
 type Query struct {
