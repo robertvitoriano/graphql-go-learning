@@ -31,6 +31,7 @@ func (r *mutationResolver) CreateCourses(ctx context.Context, input model.NewCou
 	}
 
 	category, err := r.CategoryDB.FindByID(input.CategoryID)
+
 	if err != nil {
 		return nil, err
 	}
@@ -77,10 +78,19 @@ func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 	var coursesModel []*model.Course
 
 	for _, course := range courses {
+		category, categoryErr := r.CategoryDB.FindByID(course.Category)
+		if categoryErr != nil {
+			return nil, categoryErr
+		}
 		coursesModel = append(coursesModel, &model.Course{
 			ID:          course.ID,
 			Name:        course.Name,
 			Description: &course.Description,
+			Category: &model.Category{
+				ID:          category.ID,
+				Name:        category.Name,
+				Description: &category.Description,
+			},
 		})
 	}
 
